@@ -119,7 +119,7 @@ def ancho_a_largo(paquetes_destino):
                 valor = valores[posicion]
                 # El total no es un destino, y un faltante no se puede marcar como cero:
                 # si se rellena se distorsionan promedios y variaciones.
-                if destino == CLAVE_TOTAL or valor is None: 
+                if destino == CLAVE_TOTAL or valor is None:
                     continue
                 filas.append({
                     "anio": anio,
@@ -146,9 +146,9 @@ def clasificar_region(destino):
     diccionario, devolvé config.REGION_POR_DEFECTO en lugar de romper.
     """
     # TODO 2 --------------------------------------------------------------
-    # Una sola línea. Pista: el método .get() de los diccionarios acepta
-    # un segundo argumento con el valor por defecto (lo viste en la Clase 3).
-    raise NotImplementedError("TODO 2: implementá clasificar_region()")
+    # Si hay un país nuevo en la API que no haya sido mapeado
+    # se usa la región por defecto y así no se corta el pipeline
+    return config.REGIONES.get(destino, config.REGION_POR_DEFECTO)
     # ---------------------------------------------------------------------
 
 

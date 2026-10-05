@@ -105,25 +105,29 @@ def ancho_a_largo(paquetes_destino):
     filas = []
 
     # TODO 1 --------------------------------------------------------------
-    # Recorré cada paquete, y dentro de cada uno cada fila de 'data'.
-    #
-    # Pistas:
-    #   - Para separar fecha y valores:   fecha = fila_cruda[0]
-    #                                     valores = fila_cruda[1:]
-    #   - Para saber en qué posición está el total:
-    #                                     columnas.index(CLAVE_TOTAL)
-    #   - Para recorrer nombre y posición a la vez:
-    #                                     for i, nombre in enumerate(columnas)
-    #   - Usá extraer_anio() para el año.
-    #
-    # Estructura sugerida (bucles anidados, como en la Clase 3):
-    #   for paquete in paquetes_destino:
-    #       ... leer provincia y orden_columnas ...
-    #       for fila_cruda in paquete["data"]:
-    #           ... calcular anio y total ...
-    #           for posicion, nombre in enumerate(columnas):
-    #               ... saltear el total y los None, y hacer filas.append({...})
-    raise NotImplementedError("TODO 1: implementá ancho_a_largo()")
+    for paquete in paquetes_destino:
+        provincia = paquete["provincia"]
+        columnas = paquete["orden_columnas"]
+        posicion_total = columnas.index(CLAVE_TOTAL)
+
+        for fila_cruda in paquete["data"]:
+            anio = extraer_anio(fila_cruda[0])
+            valores = fila_cruda[1:]
+            total = valores[posicion_total]
+
+            for posicion, destino in enumerate(columnas):
+                valor = valores[posicion]
+                # El total no es un destino, y un faltante no se puede marcar como cero:
+                # si se rellena se distorsionan promedios y variaciones.
+                if destino == CLAVE_TOTAL or valor is None: 
+                    continue
+                filas.append({
+                    "anio": anio,
+                    "provincia": provincia,
+                    "destino": destino,
+                    "valor_musd": round(valor, 2),
+                    "total_provincia_musd": round(total, 2) if total is not None else None,
+                })
     # ---------------------------------------------------------------------
 
     logging.info("  ancho_a_largo: %s filas", len(filas))

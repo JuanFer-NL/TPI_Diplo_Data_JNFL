@@ -173,7 +173,13 @@ def calcular_participacion(valor, total):
     Redondeá a 2 decimales.
     """
     # TODO 4 --------------------------------------------------------------
-    raise NotImplementedError("TODO 4: implementá calcular_participacion()")
+    # Se devuelve None y no cero porque un dato faltante no es lo mismo
+    # que haber exportado cero, y un cero inventado sesgaría cálculos futuros
+    if total is None or total == 0:
+        return None
+
+    participacion_destino = (valor / total) * 100
+    return round(participacion_destino, 2)
     # ---------------------------------------------------------------------
 
 

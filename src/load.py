@@ -77,9 +77,19 @@ def chequear_rangos(filas):
     sospechoso: no existen exportaciones negativas.
     """
     # TODO 10 -------------------------------------------------------------
-    # Pista: una comprensión de lista con la condición al final te da
-    # directamente las filas fuera de rango; después mirás cuántas son.
-    raise NotImplementedError("TODO 10: implementá chequear_rangos()")
+    # Se consideran fuera de rango aquellas exportaciones negativas
+    # o aquellas que superen el umbral de valor máximo razonable
+    # porque no pueden haber exportaciones negativas y un valor muy alto
+    # suele ser un error de carga o de unidad
+    fuera_de_rango = [
+        f["valor_musd"] for f in filas
+        if f["valor_musd"] < 0
+        or f["valor_musd"] > config.VALOR_MAXIMO_RAZONABLE
+    ]
+    cant_fuera_de_rango = len(fuera_de_rango)
+    ok = cant_fuera_de_rango == 0
+    mensaje = f"rangos: existen {cant_fuera_de_rango} valores sospechosos"
+    return ok, mensaje
     # ---------------------------------------------------------------------
 
 

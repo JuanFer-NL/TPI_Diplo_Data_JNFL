@@ -175,7 +175,7 @@ def calcular_participacion(valor, total):
     # TODO 4 --------------------------------------------------------------
     # Se devuelve None y no cero porque un dato faltante no es lo mismo
     # que haber exportado cero, y un cero inventado sesgaría cálculos futuros
-    if total is None or total == 0:
+    if valor is None or total is None or total == 0:
         return None
 
     participacion_destino = (valor / total) * 100
@@ -312,11 +312,32 @@ def construir_indice_rubros(paquetes_rubro):
     indice = {}
 
     # TODO 8a -------------------------------------------------------------
-    # Pistas:
-    #   - Para el rubro con mayor valor:  max(dic, key=dic.get)
-    #   - El total del año es la suma de los 4 rubros: sum(dic.values())
-    #   - Descartá los valores None antes de sumar.
-    raise NotImplementedError("TODO 8a: implementá construir_indice_rubros()")
+    for paquete in paquetes_rubro:
+        provincia = paquete["provincia"]
+        columnas = paquete["orden_columnas"]
+
+        for fila_cruda in paquete["data"]:
+            anio = extraer_anio(fila_cruda[0])
+            valores = fila_cruda[1:]
+
+            # Se sacan los rubros sin datos para que no ganen
+            # ni sumen al total del año
+            valor_por_rubro = {
+                rubro: valor
+                for rubro, valor in zip(columnas, valores)
+                if valor is not None
+            }
+            if not valor_por_rubro:
+                continue
+
+            total_anio = sum(valor_por_rubro.values())
+            rubro_max = max(valor_por_rubro, key=valor_por_rubro.get)
+            indice[(provincia, anio)] = {
+                "rubro_principal": rubro_max,
+                "pp_participacion_pct": calcular_participacion(
+                    valor_por_rubro.get("Productos primarios"), total_anio
+                ),
+            }
     # ---------------------------------------------------------------------
 
     logging.info("  índice de rubros: %s claves (provincia, año)", len(indice))

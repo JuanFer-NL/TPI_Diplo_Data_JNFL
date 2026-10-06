@@ -353,9 +353,15 @@ def unir_con_rubros(filas, indice_rubros):
     CONTRATO: modifica y devuelve la misma lista de filas.
     """
     # TODO 8b -------------------------------------------------------------
-    # Para cada fila, buscá indice_rubros.get((provincia, anio)) y asigná
-    # 'rubro_principal' y 'pp_participacion_pct'. Si no hay match, None.
-    raise NotImplementedError("TODO 8b: implementá unir_con_rubros()")
+    for fila in filas:
+        clave = (fila["provincia"], fila["anio"])
+        # LEFT JOIN: si no hay match, el dict vacío deja las columnas
+        # en None y la fila se conserva
+        datos_rubro = indice_rubros.get(clave, {})
+        fila["rubro_principal"] = datos_rubro.get("rubro_principal")
+        fila["pp_participacion_pct"] = datos_rubro.get("pp_participacion_pct")
+
+    return filas
     # ---------------------------------------------------------------------
 
 

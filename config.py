@@ -168,6 +168,9 @@ REGION_POR_DEFECTO = "Otros"
 # PARÁMETROS DE NEGOCIO
 # ----------------------------------------------------------------------
 TOP_N = 3          # cuántos destinos se marcan como 'es_top3'
+# "Resto" es una bolsa de países no listados, no es un destino
+# que se pueda comparar, así que queda fuera del ranking
+DESTINO_SIN_RANKING = "Resto"
 ANIO_MINIMO = 1993
 ANIO_MAXIMO = 2024
 

@@ -264,14 +264,28 @@ def agregar_ranking(filas, top_n=None):
         top_n = config.TOP_N
 
     # TODO 7 --------------------------------------------------------------
-    # Estrategia sugerida:
-    #   1. Agrupá las filas en un dict cuya clave sea (provincia, anio).
-    #      Pista: dict.setdefault(clave, []).append(fila)
-    #   2. Para cada grupo, ordenalo por valor_musd de mayor a menor:
-    #      sorted(grupo, key=lambda f: f["valor_musd"], reverse=True)
-    #   3. Recorré el grupo ordenado con enumerate(..., start=1) y asigná
-    #      'ranking_destino' y 'es_top3' (un booleano: posición <= top_n).
-    raise NotImplementedError("TODO 7: implementá agregar_ranking()")
+    # Se rankean los países por provincia y año
+    grupos = {}
+    for fila in filas:
+        clave_prov_anio = (fila["provincia"], fila["anio"])
+        grupos.setdefault(clave_prov_anio, []).append(fila)
+
+    for grupo in grupos.values():
+        # Se excluye a Resto del ranking
+        for fila in grupo:
+            if fila["destino"] == config.DESTINO_SIN_RANKING:
+                fila["ranking_destino"] = None
+                fila["es_top3"] = False
+
+        paises = [
+            f for f in grupo if f["destino"] != config.DESTINO_SIN_RANKING
+        ]
+        orden = sorted(paises, key=lambda f: f["valor_musd"], reverse=True)
+        for posicion, fila in enumerate(orden, start=1):
+            fila["ranking_destino"] = posicion
+            fila["es_top3"] = posicion <= top_n
+
+    return filas
     # ---------------------------------------------------------------------
 
 
@@ -327,6 +341,21 @@ def unir_con_rubros(filas, indice_rubros):
 # ======================================================================
 # ORQUESTACIÓN DEL TRANSFORM  (ya resuelta: no hace falta tocarla)
 # ======================================================================
+
+def calcular_clave_orden(fila):
+    """Devuelve la clave para ordenar el dataset final:
+    provincia, año y ranking (1 primero).
+
+    Las filas sin ranking (Resto) van al final de su grupo. Para lograr
+    esto se reemplaza el None de Resto con infinito porque no se puede
+    comparar un NoneType con un número.
+    """
+    ranking = fila["ranking_destino"]
+    if ranking is None:
+        ranking = float("inf")
+    return (fila["provincia"], fila["anio"], ranking)
+
+
 def ordenar_columnas(filas):
     """Devuelve las filas con las claves en el orden definido por COLUMNAS."""
     return [{columna: fila.get(columna) for columna in COLUMNAS} for fila in filas]
@@ -349,7 +378,7 @@ def transformar(datos_crudos):
     indice = construir_indice_rubros(datos_crudos["rubro"])
     filas = unir_con_rubros(filas, indice)
 
-    filas.sort(key=lambda f: (f["provincia"], f["anio"], f["ranking_destino"]))
+    filas.sort(key=calcular_clave_orden)
     filas = ordenar_columnas(filas)
 
     logging.info("TRANSFORM OK: %s filas x %s columnas", len(filas), len(COLUMNAS))

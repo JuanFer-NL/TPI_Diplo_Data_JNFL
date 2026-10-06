@@ -60,9 +60,13 @@ def chequear_unicidad(filas):
     Debe devolver (bool, mensaje), igual que los checks de arriba.
     """
     # TODO 9 --------------------------------------------------------------
-    # Pista: es el patrón del set que viste en la Clase 3. Armá la lista de
-    # claves (una tupla por fila) y compará len(lista) con len(set(lista)).
-    raise NotImplementedError("TODO 9: implementá chequear_unicidad()")
+    claves = [(f["provincia"], f["anio"], f["destino"]) for f in filas]
+    # Se descartan los duplicados usando set() y luego se comparan
+    # con la lista original
+    duplicados = len(claves) - len(set(claves))
+    ok = duplicados == 0
+    mensaje = f"unicidad: {duplicados} filas duplicadas"
+    return ok, mensaje
     # ---------------------------------------------------------------------
 
 

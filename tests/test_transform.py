@@ -145,21 +145,32 @@ class TestJoinRubros(unittest.TestCase):
 # TODO 13 (BONUS) — Escribí vos estos dos tests
 # ======================================================================
 class TestPropios(unittest.TestCase):
-    """Sumá tus propios casos. Ideas:
-
-    - ¿Qué pasa si 'paquetes_destino' viene vacío? ancho_a_largo()
-      debería devolver [] y no romper.
-    - ¿El ranking asigna bien cuando hay empate en valor_musd?
-    - ¿calcular_decada() funciona con un año de otra década, como 2010?
+    """Tests propios: casos borde y decisiones de diseño
+    (lista vacía y exclusión de Resto del ranking).
     """
 
-    @unittest.skip("TODO 13: quitá este skip y escribí el test")
     def test_lista_vacia(self):
-        self.fail("Escribí este test")
+        # Si la API falla para todas las provincias, no hay paquetes:
+        # el transform tiene que devolver una lista vacía, no romper
+        self.assertEqual(transform.ancho_a_largo([]), [])
 
-    @unittest.skip("TODO 13: quitá este skip y escribí el test")
-    def test_a_eleccion(self):
-        self.fail("Escribí este test")
+    def test_resto_queda_fuera_del_ranking(self):
+        # Resto agrupa países no listados: no compite, aunque sea el mayor
+        filas = [
+            {"provincia": "Chaco", "anio": 2024,
+             "destino": "Resto", "valor_musd": 193.7},
+            {"provincia": "Chaco", "anio": 2024,
+             "destino": "China", "valor_musd": 110.9},
+            {"provincia": "Chaco", "anio": 2024,
+             "destino": "Chile", "valor_musd": 19.8},
+        ]
+        transform.agregar_ranking(filas, top_n=1)
+        por_destino = {f["destino"]: f for f in filas}
+        self.assertIsNone(por_destino["Resto"]["ranking_destino"])
+        self.assertFalse(por_destino["Resto"]["es_top3"])
+        self.assertEqual(por_destino["China"]["ranking_destino"], 1)
+        self.assertTrue(por_destino["China"]["es_top3"])
+        self.assertEqual(por_destino["Chile"]["ranking_destino"], 2)
 
 
 if __name__ == "__main__":

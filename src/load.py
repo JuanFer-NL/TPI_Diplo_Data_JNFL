@@ -271,6 +271,7 @@ def escribir_log_corrida(resumen, carpeta=None, nombre=None):
         f.write(linea)
 
     logging.info("  LOG: %s", ruta)
+    return ruta
     # ---------------------------------------------------------------------
 
 

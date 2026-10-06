@@ -179,13 +179,48 @@ def construir_resumen(filas, detalle_checks):
         quality_checks     (list) el detalle_checks que recibís
     """
     # TODO 11 -------------------------------------------------------------
-    # Pistas:
-    #   - Para la lista de valores: [f["valor_musd"] for f in filas]
-    #   - min(), max() y sum()/len() ya los conocés.
-    #   - Para provincias únicas y ordenadas: sorted({f["provincia"] for f in filas})
-    #   - Para la fecha: datetime.now().strftime("%Y-%m-%d %H:%M")
-    #   - Podés agregar más claves si querés (suma puntos en la rúbrica).
-    raise NotImplementedError("TODO 11: implementá construir_resumen()")
+    anios = [f["anio"] for f in filas]
+    provincias = [f["provincia"] for f in filas]
+    valores = [f["valor_musd"] for f in filas]
+    valor_min = min(valores)
+    valor_max = max(valores)
+    valor_prom = round(sum(valores) / len(valores), 2)
+    nulos_var_interanual_pct = sum(
+        1 for f in filas if f["var_interanual_pct"] is None
+    )
+    nulos_participacion_pct = sum(
+        1 for f in filas if f["participacion_pct"] is None
+    )
+    nulos_ranking_destino = sum(
+        1 for f in filas if f["ranking_destino"] is None
+    )
+
+    resumen = {
+        "dataset": "Exportaciones anuales NEA",
+        "fuente": "INDEC - API de Series de Tiempo de datos.gob.ar",
+        "unidad": "millones de dólares FOB",
+        "generado": datetime.now().strftime("%Y-%m-%d %H:%M"),
+        "filas": len(filas),
+        "columnas": len(COLUMNAS),
+        "periodo": {"desde": min(anios), "hasta": max(anios)},
+        "provincias": sorted(set(provincias)),
+        "valor_musd": {
+            "minimo": valor_min,
+            "maximo": valor_max,
+            "promedio": valor_prom,
+        },
+        # Se agregó la cantidad de nulos para que de esta forma el
+        # receptor pueda tener una idea del dataset con solo
+        # leer el JSON
+        "cantidad_nulos": {
+            "var_interanual_pct": nulos_var_interanual_pct,
+            "participacion_pct": nulos_participacion_pct,
+            "ranking_destino": nulos_ranking_destino,
+        },
+        "quality_checks": detalle_checks,
+    }
+
+    return resumen
     # ---------------------------------------------------------------------
 
 

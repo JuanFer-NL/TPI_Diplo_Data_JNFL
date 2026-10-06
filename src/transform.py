@@ -1,5 +1,5 @@
 """
-TRANSFORM — De datos crudos a un dataset analítico   *** ACÁ TRABAJÁS VOS ***
+TRANSFORM — De datos crudos a un dataset analítico
 =============================================================================
 
 Este es el corazón del TP. El Extract ya te trae los datos y el Load ya
@@ -11,7 +11,7 @@ El recorrido es:
         fecha        China   Brasil   ...   __TOTAL__
         1993-01-01    12.3     45.6   ...      120.0
 
-              |  ancho_a_largo()          <- TODO 1
+              |  ancho_a_largo()
               v
 
     formato LARGO / "tidy" (una fila por observación)
@@ -19,21 +19,11 @@ El recorrido es:
         1993  Chaco      China          12.3                 120.0
         1993  Chaco      Brasil         45.6                 120.0
 
-              |  + columnas derivadas     <- TODO 2, 3, 4, 5, 6
-              |  + join con rubros        <- TODO 7, 8
+              |  + columnas derivadas
+              |  + join con rubros
               v
 
     dataset final de 13 columnas
-
-CÓMO TRABAJAR
--------------
-Hay 8 TODOs numerados. Hacelos EN ORDEN: cada uno usa el anterior.
-Después de cada TODO corré los tests para ver si vas bien:
-
-    python tests/test_transform.py
-
-Las funciones ya tienen su docstring con el CONTRATO (qué recibe, qué
-devuelve). Respetalo: el resto del pipeline cuenta con eso.
 """
 
 import logging
@@ -114,11 +104,13 @@ def ancho_a_largo(paquetes_destino):
             anio = extraer_anio(fila_cruda[0])
             valores = fila_cruda[1:]
             total = valores[posicion_total]
+            total_redondeado = round(total, 2) if total is not None else None
 
             for posicion, destino in enumerate(columnas):
                 valor = valores[posicion]
-                # El total no es un destino, y un faltante no se puede marcar como cero:
-                # si se rellena se distorsionan promedios y variaciones.
+                # El total no es un destino, y un faltante no se puede
+                # marcar como cero: si se rellena se distorsionan promedios
+                # y variaciones.
                 if destino == CLAVE_TOTAL or valor is None:
                     continue
                 filas.append({
@@ -126,7 +118,7 @@ def ancho_a_largo(paquetes_destino):
                     "provincia": provincia,
                     "destino": destino,
                     "valor_musd": round(valor, 2),
-                    "total_provincia_musd": round(total, 2) if total is not None else None,
+                    "total_provincia_musd": total_redondeado,
                 })
     # ---------------------------------------------------------------------
 
@@ -259,6 +251,8 @@ def agregar_ranking(filas, top_n=None):
     destino #1 de Chaco en 2024 no dice nada sobre Misiones en 1998.
 
     CONTRATO: modifica y devuelve la misma lista de filas.
+    El destino de config.DESTINO_SIN_RANKING no compite: queda con
+    ranking None y es_top3 en False
     """
     if top_n is None:
         top_n = config.TOP_N

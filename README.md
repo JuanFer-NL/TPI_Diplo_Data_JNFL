@@ -12,7 +12,7 @@ Este proyecto es un pipeline ETL que arma un dataset de las exportaciones de las
 
 Las tres etapas del pipeline son:
 
-1. **Extract**: Descarga los datos de las exportaciones de la API de datos.gob.ar y los guarda en "data/raw/". Esto es importante ya que permite volver a trabajar con los datos originales sin tener que volver a descargarlos en cada corrida.
+1. **Extract**: Descarga los datos de las exportaciones de la API de datos.gob.ar y los guarda en `data/raw/`. Esto es importante ya que permite volver a trabajar con los datos originales sin tener que volver a descargarlos en cada corrida.
 2. **Transform**: Pasa los datos de formato ancho a formato largo, es decir, de una columna por país a una fila por provincia, año y destino. Calcula, además, columnas nuevas (región, década, participación, variación interanual y ranking) y las une con los datos de los rubros.
 3. **Load**: Se encarga de validar el resultado con cinco controles: cantidad de filas, columnas, duplicados, rangos de valores y cobertura. En caso de que alguno de los controles críticos falle se corta el proceso, caso contrario se guarda el dataset final y deja registro de la corrida.
 

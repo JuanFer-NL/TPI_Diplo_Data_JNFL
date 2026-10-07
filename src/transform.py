@@ -252,7 +252,7 @@ def agregar_ranking(filas, top_n=None):
 
     CONTRATO: modifica y devuelve la misma lista de filas.
     El destino de config.DESTINO_SIN_RANKING no compite: queda con
-    ranking None y es_top3 en False
+    ranking None y es_top3 en False.
     """
     if top_n is None:
         top_n = config.TOP_N
@@ -368,7 +368,7 @@ def calcular_clave_orden(fila):
     provincia, año y ranking (1 primero).
 
     Las filas sin ranking (Resto) van al final de su grupo. Para lograr
-    esto se reemplaza el None de Resto con infinito porque no se puede
+    esto se reemplaza el None de Resto por infinito porque no se puede
     comparar un NoneType con un número.
     """
     ranking = fila["ranking_destino"]
